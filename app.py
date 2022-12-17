@@ -1,4 +1,6 @@
 import streamlit as st
+import requests
+import datetime
 
 '''
 # TaxiFareModel front
@@ -11,16 +13,48 @@ Either as with the title by just creating a string (or an f-string). Or as with 
 ''')
 
 '''
-## Here we would like to add some controllers in order to ask the user to select the parameters of the ride
+## Here we would like to add some controllers in order to ask the user to select the parameters of the ride'''
 
-1. Let's ask for:
-- date and time
-- pickup longitude
-- pickup latitude
-- dropoff longitude
-- dropoff latitude
-- passenger count
-'''
+'''_______________________________________________________________________________'''
+
+#date and time
+pickup_date = st.date_input(
+    "Enter your pickup datetime",
+    datetime.date(2014, 7, 6))
+st.write('Your pickup datetime is:', pickup_date)
+pickup_datetime = str(pickup_date) + ' 17:18:00'
+
+'''_______________________________________________________________________________'''
+
+#pickup longitude
+pickup_longitude = st.number_input('Enter the pickup longitude',-73.950655)
+st.write('Your pickup longitude  is ', pickup_longitude)
+
+'''_______________________________________________________________________________'''
+
+#pickup latitude
+pickup_latitude = st.number_input('Enter the pickup latitude',40.783282)
+st.write('Your pickup latitude  is ', pickup_latitude)
+
+'''_______________________________________________________________________________'''
+
+#dropoff longitude
+dropoff_longitude = st.number_input('Enter the dropoff longitude',-73.984365)
+st.write('Your dropoff longitude  is ', dropoff_longitude)
+
+'''_______________________________________________________________________________'''
+
+#dropoff latitude
+dropoff_latitude = st.number_input('Enter the dropoff latitude',40.769802)
+st.write('Your dropoff latitude  is ', dropoff_latitude)
+
+'''_______________________________________________________________________________'''
+
+#passenger count
+passenger_count = st.slider('Select the number of passengers', 0, 10, 2)
+st.write('Total passengers: ', passenger_count)
+
+'''_______________________________________________________________________________'''
 
 '''
 ## Once we have these, let's call our API in order to retrieve a prediction
@@ -36,13 +70,20 @@ if url == 'https://taxifare.lewagon.ai/predict':
 
     st.markdown('Maybe you want to use your own API for the prediction, not the one provided by Le Wagon...')
 
-'''
+'''2. Let's build a dictionary containing the parameters for our API...'''
 
-2. Let's build a dictionary containing the parameters for our API...
+params = dict(pickup_datetime = pickup_datetime,
+              pickup_longitude = pickup_longitude,
+              pickup_latitude = pickup_latitude,
+              dropoff_longitude = dropoff_longitude,
+              dropoff_latitude = dropoff_latitude,
+              passenger_count = passenger_count)
 
-3. Let's call our API using the `requests` package...
+'''3. Let's call our API using the `requests` package...'''
 
-4. Let's retrieve the prediction from the **JSON** returned by the API...
+r = requests.get(url,params = params).json()
+'''4. Let's retrieve the prediction from the **JSON** returned by the API...'''
 
-## Finally, we can display the prediction to the user
-'''
+fare = r["fare"]
+st.title('Your fare is:')
+st.title('{0:.2f}'.format(fare))
